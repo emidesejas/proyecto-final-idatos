@@ -12,14 +12,14 @@ export const env = createEnv({
       .url()
       .refine(
         (str) => !str.includes("YOUR_MYSQL_URL_HERE"),
-        "You forgot to change the default URL"
+        "You forgot to change the default URL",
       ),
     DIRECT_URL: z
       .string()
       .url()
       .refine(
         (str) => !str.endsWith("?pgBouncer=true"),
-        "You should not use pgBouncer with a direct connection"
+        "You should not use pgBouncer with a direct connection",
       ),
     NODE_ENV: z
       .enum(["development", "test", "production"])
@@ -33,7 +33,12 @@ export const env = createEnv({
    */
   client: {
     NEXT_PUBLIC_SUPABASE_URL: z.string().url(),
-    NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string(),
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: z
+      .string()
+      .refine(
+        (str) => str === "your_anon_key",
+        "You forgot to update the default Supabase anon key. Please run pnpm supabase status and copy the anon key to the .env file.",
+      ),
   },
 
   /**
