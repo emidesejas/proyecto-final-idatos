@@ -1,0 +1,15 @@
+name: main CI/CD
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  build-lint:
+    uses: ./.github/workflows/build-lint.yml
+    secrets: inherit
+
+  migrate-db:
+    uses: ./.github/workflows/migrate-db.yml
+    needs: build-lint
+    secrets: inherit

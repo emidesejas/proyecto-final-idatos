@@ -6,10 +6,13 @@
     "build": "next build",
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
+    "db:migrate": "prisma migrate deploy",
+    "db:generate:migration": "prisma migrate dev",
     "dev": "next dev",
     "postinstall": "prisma generate",
     "lint": "next lint",
     "start": "next start",
+    "type-check": "tsc --noEmit",
     "apply-baseline": "prisma migrate resolve --applied 0_init"
   },
   "dependencies": {

@@ -1,0 +1,9 @@
+name: Pull Request check
+on:
+  pull_request:
+    branches: ["*"]
+
+jobs:
+  build-lint:
+    uses: ./.github/workflows/build-lint.yml
+    secrets: inherit
