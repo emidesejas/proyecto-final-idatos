@@ -36,7 +36,7 @@ export const env = createEnv({
     NEXT_PUBLIC_SUPABASE_ANON_KEY: z
       .string()
       .refine(
-        (str) => str === "your_anon_key",
+        (str) => str !== "your_anon_key",
         "You forgot to update the default Supabase anon key. Please run pnpm supabase status and copy the anon key to the .env file.",
       ),
   },
