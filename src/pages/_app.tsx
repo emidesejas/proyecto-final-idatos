@@ -5,10 +5,11 @@ import {
 import { SessionContextProvider } from "@supabase/auth-helpers-react";
 import { type AppType } from "next/app";
 
-import { api } from "~/utils/api";
+import { api } from "@utils/api";
 
-import "~/styles/globals.css";
+import "@styles/globals.css";
 import { useState } from "react";
+import { Toaster } from "@components/ui/toaster";
 
 const MyApp: AppType<{ initialSession: Session }> = ({
   Component,
@@ -23,6 +24,7 @@ const MyApp: AppType<{ initialSession: Session }> = ({
       initialSession={pageProps.initialSession}
     >
       <Component {...pageProps} />
+      <Toaster />
     </SessionContextProvider>
   );
 };
