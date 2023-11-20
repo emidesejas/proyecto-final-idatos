@@ -14,7 +14,7 @@ export async function middleware(req: NextRequest) {
       return res;
     }
 
-    return NextResponse.redirect(new URL("/sign-up", req.url));
+    return NextResponse.redirect(new URL("/sign-in", req.url));
   }
 
   return res;
