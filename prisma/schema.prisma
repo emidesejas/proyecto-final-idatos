@@ -11,10 +11,11 @@ datasource db {
 }
 
 model Tokens {
-  id      String @id @default(cuid())
-  service String
-  token   String
-  type    String
+  id         String   @id @default(cuid())
+  service    String
+  token      String
+  type       String
+  validUntil DateTime @db.Timestamp()
 
   @@index([service], map: "service_token_idx")
   @@schema("public")

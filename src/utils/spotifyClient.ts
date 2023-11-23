@@ -24,10 +24,14 @@ type GenerateTokenResponse = {
 };
 
 const getSpotifyToken = async () => {
-  const token = await db.tokens.findFirst({ where: { service: "spotify" } });
-  if (token) {
+  const tokenData = await db.tokens.findFirst({
+    where: { service: "spotify" },
+    orderBy: { validUntil: "desc" },
+  });
+
+  if (tokenData && tokenData.validUntil > new Date()) {
     console.log("🔑 Spotify token found in database");
-    return token.token;
+    return tokenData.token;
   }
 
   console.log("❌ Spotify token not found in database");
@@ -52,15 +56,67 @@ const getSpotifyToken = async () => {
       type: "Bearer",
       token: data.accessToken,
       service: "spotify",
+      validUntil: new Date(Date.now() + data.expiresIn * 1000),
     },
   });
 
   return data.accessToken;
 };
 
-type TrackObject = {
-  album: any;
-  artists: any[];
+export type TrackObject = {
+  album: {
+    albumType: string;
+    artists: {
+      externalUrls: {
+        spotify: string;
+      };
+      href: string;
+      id: string;
+      name: string;
+      type: "artist";
+      uri: string;
+    }[];
+    availableMarkets: string[];
+    externalUrls: {
+      spotify: string;
+    };
+    href: string;
+    id: string;
+    images: {
+      height: number;
+      url: string;
+      width: number;
+    }[];
+    name: string;
+    releaseDate: string;
+    releaseDatePrecision: string;
+    totalTracks: number;
+    type: "album";
+    uri: string;
+  };
+  artists: {
+    externalUrls: {
+      spotify: string;
+    };
+    followers: {
+      href: string;
+      total: number;
+    };
+    genres: string[];
+    href: string;
+    id: string;
+    images: [
+      {
+        url: string;
+        height: number;
+        width: number;
+      },
+    ];
+    name: string;
+    popularity: number;
+    type: "artist";
+    uri: string;
+  }[];
   availableMarkets: string[];
   discNumber: number;
   durationMs: number;
@@ -105,7 +161,7 @@ export const search = async (text: string) => {
     return null;
   }
 
-  const { data } = await spotifyClient.get<SearchResponse>("search", {
+  const { data, status } = await spotifyClient.get<SearchResponse>("search", {
     params: {
       q: text,
       type: "track",
@@ -114,6 +170,11 @@ export const search = async (text: string) => {
       Authorization: `Bearer ${accessToken}`,
     },
   });
+
+  if (status !== 200) {
+    console.log("❌ Spotify search failed with status", status);
+    return null;
+  }
 
   return data;
 };
