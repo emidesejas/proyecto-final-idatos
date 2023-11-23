@@ -6,10 +6,17 @@ import { Input } from "@components/ui/input";
 import { useDebounce } from "@hooks/useDebounce";
 import { useState } from "react";
 import { ScrollArea } from "@components/ui/scroll-area";
+import { Button } from "@components/ui/button";
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useToast } from "@components/ui/use-toast";
+import { useRouter } from "next/router";
 
 export default function Home() {
   const [queryString, setQueryString] = useState("");
+  const supabase = useSupabaseClient();
   const query = useDebounce(queryString, 500);
+  const { toast } = useToast();
+  const router = useRouter();
 
   const { data } = api.spotify.search.useQuery(
     { text: query },
@@ -29,17 +36,43 @@ export default function Home() {
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className="flex min-h-screen flex-col items-center justify-center">
+      <main className="flex h-screen flex-col items-center justify-center">
+        <div className="flex w-full justify-between bg-gray-100 p-4">
+          <Button
+            variant="link"
+            className="ml-auto h-5 p-0"
+            onClick={async () => {
+              const { error } = await supabase.auth.signOut();
+
+              if (!error) {
+                await router.replace("/sign-in");
+                toast({
+                  title: "¡Hasta luego!",
+                  description: "Esperamos verte pronto",
+                });
+                return;
+              }
+
+              toast({
+                variant: "destructive",
+                title: "Error",
+                description: error.message,
+              });
+            }}
+          >
+            Logout
+          </Button>
+        </div>
         <h1 className="mt-32 text-5xl font-semibold">Conocé tu música</h1>
 
         <Input
-          className="mb-10 mt-12 max-w-lg text-xl"
+          className="mt-9 max-w-lg text-xl"
           onChange={(event) => {
             setQueryString(event.target.value);
           }}
           placeholder="Buscá tu canción favorita..."
         />
-        <ScrollArea className="h-48 w-full px-8">
+        <ScrollArea className="mt-10 w-full flex-1 px-8">
           {data?.tracks.items.map(
             ({
               id,
