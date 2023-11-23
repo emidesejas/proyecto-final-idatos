@@ -10,6 +10,18 @@ datasource db {
   schemas   = ["auth", "public"]
 }
 
+model Tokens {
+  id      String @id @default(cuid())
+  service String
+  token   String
+  type    String
+
+  @@index([service], map: "service_token_idx")
+  @@schema("public")
+}
+
+/// Supabase
+
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model audit_log_entries {
   instance_id String?   @db.Uuid

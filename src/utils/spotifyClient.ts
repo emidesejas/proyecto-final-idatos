@@ -1,6 +1,7 @@
 import { env } from "@env.mjs";
 import axios from "axios";
 import applyCaseMiddleware from "axios-case-converter";
+import { db } from "@server/db";
 
 const spotifyAccountsClient = applyCaseMiddleware(
   axios.create({
@@ -23,6 +24,15 @@ type GenerateTokenResponse = {
 };
 
 const getSpotifyToken = async () => {
+  const token = await db.tokens.findFirst({ where: { service: "spotify" } });
+  if (token) {
+    console.log("🔑 Spotify token found in database");
+    return token.token;
+  }
+
+  console.log("❌ Spotify token not found in database");
+  console.log("🔑 Generating token for Spotify");
+
   const params = new URLSearchParams();
   params.append("grant_type", "client_credentials");
   params.append("client_id", env.SPOTIFY_CLIENT_ID);
@@ -37,8 +47,15 @@ const getSpotifyToken = async () => {
     },
   );
 
-  console.log("🔑 Spotify token generated: ", data.accessToken);
-  return data;
+  await db.tokens.create({
+    data: {
+      type: "Bearer",
+      token: data.accessToken,
+      service: "spotify",
+    },
+  });
+
+  return data.accessToken;
 };
 
 type TrackObject = {
@@ -81,7 +98,7 @@ type SearchResponse = {
 };
 
 export const search = async (text: string) => {
-  const { accessToken } = (await getSpotifyToken()) ?? {};
+  const accessToken = await getSpotifyToken();
 
   if (!accessToken) {
     console.log("❌ No access token");
