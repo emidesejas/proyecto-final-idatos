@@ -10,6 +10,7 @@ datasource db {
   schemas   = ["auth", "public"]
 }
 
+// System
 model Tokens {
   id         String   @id @default(cuid())
   service    String
@@ -18,6 +19,95 @@ model Tokens {
   validUntil DateTime @db.Timestamp()
 
   @@index([service], map: "service_token_idx")
+  @@schema("public")
+}
+
+// Business Logic
+
+model Track {
+  id              String   @id @default(cuid())
+  duration        Int
+  explicit        Boolean
+  name            String
+  image           String
+  wikiDescription String?
+  releaseDate     DateTime
+  playCount       Int
+  listeners       Int
+  tags            String[]
+
+  // Relations
+  // 1 to N: track has many identifiers
+  identifiers Identifier[]
+
+  // N to 1: track has at most one album
+  album   Album?  @relation(fields: [albumId], references: [id], onDelete: SetNull)
+  albumId String?
+
+  // N to N: track has many artists
+  artists Artist[]
+
+  @@schema("public")
+}
+
+model Artist {
+  id    String @id @default(cuid())
+  name  String
+  image String
+
+  // Relations
+  // 1 to N: artist has many identifiers
+  identifiers Identifier[]
+
+  // N to N: artist has many tracks
+  tracks Track[]
+
+  // N to N: artist has many albums
+  albums Album[]
+
+  @@schema("public")
+}
+
+model Album {
+  id          String   @id @default(cuid())
+  title       String
+  image       String
+  releaseDate DateTime
+  totalTracks Int
+
+  // Relations
+  // 1 to N: album has many identifiers
+  identifiers Identifier[]
+
+  // 1 to N: album has many tracks
+  tracks Track[]
+
+  // N to N: album has many artists
+  artists Artist[]
+
+  @@schema("public")
+}
+
+model Identifier {
+  id         String @id @default(cuid())
+  externalId String
+  type       String
+  url        String
+
+  // Relations
+  // N to 1: identifier has at most one track
+  track   Track?  @relation(fields: [trackId], references: [id], onDelete: Cascade)
+  trackId String?
+
+  // N to 1: identifier has at most one artist
+  Artist   Artist? @relation(fields: [artistId], references: [id], onDelete: Cascade)
+  artistId String?
+
+  // N to 1: identifier has at most one album
+  Album   Album?  @relation(fields: [albumId], references: [id], onDelete: Cascade)
+  albumId String?
+
+  @@index([type], map: "type_identifier_idx")
   @@schema("public")
 }
 

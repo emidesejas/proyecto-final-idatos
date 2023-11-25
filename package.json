@@ -7,7 +7,7 @@
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
     "db:migrate": "prisma migrate deploy",
-    "db:generate:migration": "prisma migrate dev",
+    "db:generate:migration": "prisma migrate dev --create-only",
     "dev": "next dev",
     "postinstall": "prisma generate",
     "lint": "next lint",
