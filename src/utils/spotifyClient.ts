@@ -105,7 +105,7 @@ export type TrackObject = {
     genres: string[];
     href: string;
     id: string;
-    images: [
+    images?: [
       {
         url: string;
         height: number;
@@ -173,6 +173,33 @@ export const search = async (text: string) => {
 
   if (status !== 200) {
     console.log("❌ Spotify search failed with status", status);
+    return null;
+  }
+
+  return data;
+};
+
+export const getTrack = async (trackId: string) => {
+  const accessToken = await getSpotifyToken();
+
+  if (!accessToken) {
+    console.log("❌ No access token");
+    return null;
+  }
+
+  const { data, status } = await spotifyClient.get<TrackObject>(
+    `tracks/${trackId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    },
+  );
+
+  if (status !== 200) {
+    console.log(
+      `❌ Spotify getTrack for id: ${trackId} failed with status: ${status}`,
+    );
     return null;
   }
 

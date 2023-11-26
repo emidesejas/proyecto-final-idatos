@@ -25,15 +25,15 @@ model Tokens {
 // Business Logic
 
 model Track {
-  id              String   @id @default(cuid())
+  id              String    @id @default(cuid())
   duration        Int
   explicit        Boolean
   name            String
   image           String
   wikiDescription String?
-  releaseDate     DateTime
-  playCount       Int
-  listeners       Int
+  releaseDate     DateTime?
+  playCount       Int?
+  listeners       Int?
   tags            String[]
 
   // Relations
@@ -107,6 +107,9 @@ model Identifier {
   Album   Album?  @relation(fields: [albumId], references: [id], onDelete: Cascade)
   albumId String?
 
+  @@unique([trackId, externalId, type], map: "track_id_external_id_type_identifier_idx")
+  @@unique([artistId, externalId, type], map: "artist_id_external_id_type_identifier_idx")
+  @@unique([albumId, externalId, type], map: "album_id_external_id_type_identifier_idx")
   @@index([type], map: "type_identifier_idx")
   @@schema("public")
 }
