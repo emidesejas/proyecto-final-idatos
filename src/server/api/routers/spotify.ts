@@ -22,8 +22,6 @@ export const spotifyRouter = createTRPCRouter({
       if (track === null) {
         const spotifyTrackData = await getTrack(trackId);
 
-        console.log(spotifyTrackData);
-
         if (spotifyTrackData === null) {
           throw new TRPCError({
             message: "Spotify track not found",
@@ -71,10 +69,19 @@ export const spotifyRouter = createTRPCRouter({
         const newTrack = await ctx.db.track.create({
           data: {
             identifiers: {
-              create: {
-                externalId: trackId,
-                type: "spotify",
-                url: "",
+              createMany: {
+                data: [
+                  {
+                    externalId: trackId,
+                    type: "spotify",
+                    url: "",
+                  },
+                  {
+                    externalId: spotifyTrackData.externalIds.isrc,
+                    type: "isrc",
+                    url: "",
+                  },
+                ],
               },
             },
             duration: spotifyTrackData.durationMs,
