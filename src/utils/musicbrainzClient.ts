@@ -26,7 +26,5 @@ export const getMusicbrainzId = async (isrc: string) => {
     `isrc/${isrc}?inc=artists+isrcs&fmt=json`,
   );
 
-  console.log("musicbrainz data", data);
-
   return data.recordings[0]?.id ?? null;
 };

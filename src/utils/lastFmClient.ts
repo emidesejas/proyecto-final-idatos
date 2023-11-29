@@ -53,6 +53,33 @@ type TrackGetInfoResponse = {
   };
 };
 
+type TrackSearchResponse = {
+  results: {
+    openSearchQuery: {
+      text: string;
+      role: string;
+      startPage: string;
+    };
+    opensearchTotalResults: string;
+    opensearchStartIndex: string;
+    opensearchItemsPerPage: string;
+    trackmatches: {
+      track: {
+        name: string;
+        artist: string;
+        url: string;
+        streamable: string;
+        listeners: string;
+        image: {
+          text: string;
+          size: string;
+        }[];
+        mbid: string;
+      }[];
+    };
+  };
+};
+
 export const getLastFmTrackData = async (musicbrainzId: string) => {
   const { data } = await lastFmClient.get<TrackGetInfoResponse>("", {
     params: {
@@ -63,6 +90,22 @@ export const getLastFmTrackData = async (musicbrainzId: string) => {
 
   if ("error" in data) {
     console.log("Could not get data from last fm for track:", musicbrainzId);
+    return null;
+  }
+
+  return data;
+};
+
+export const searchLastFm = async (query: string) => {
+  const { data } = await lastFmClient.get<TrackSearchResponse>("", {
+    params: {
+      method: "track.search",
+      track: query,
+    },
+  });
+
+  if ("error" in data) {
+    console.log("Could not search from last fm for query:", query);
     return null;
   }
 

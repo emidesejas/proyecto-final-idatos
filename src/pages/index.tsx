@@ -6,22 +6,16 @@ import { Input } from "@components/ui/input";
 import { useDebounce } from "@hooks/useDebounce";
 import { useRef, useState } from "react";
 import { ScrollArea } from "@components/ui/scroll-area";
-import { Button } from "@components/ui/button";
-import { useSupabaseClient } from "@supabase/auth-helpers-react";
-import { useToast } from "@components/ui/use-toast";
-import { useRouter } from "next/router";
 import { TrackCard } from "@components/TrackCard";
 import SpotifyLogo from "@images/spotify.png";
 import { X } from "lucide-react";
 
 import { Bars } from "react-loader-spinner";
+import Header from "@components/Header";
 
 export default function Home() {
   const [queryString, setQueryString] = useState("");
-  const supabase = useSupabaseClient();
   const query = useDebounce(queryString, 500);
-  const { toast } = useToast();
-  const router = useRouter();
 
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -45,32 +39,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="flex h-screen flex-col items-center justify-center">
-        <div className="flex w-full justify-between bg-gray-100 p-4">
-          <Button
-            variant="link"
-            className="ml-auto h-5 p-0"
-            onClick={async () => {
-              const { error } = await supabase.auth.signOut();
-
-              if (!error) {
-                await router.replace("/sign-in");
-                toast({
-                  title: "¡Hasta luego!",
-                  description: "Esperamos verte pronto",
-                });
-                return;
-              }
-
-              toast({
-                variant: "destructive",
-                title: "Error",
-                description: error.message,
-              });
-            }}
-          >
-            Logout
-          </Button>
-        </div>
+        <Header />
         <h1 className="mt-32 text-5xl font-semibold">Conocé tu música</h1>
 
         <div className="mt-9 flex w-full max-w-lg flex-row items-center">
